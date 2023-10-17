@@ -22,19 +22,19 @@ def test_do_command_commit_no_message():
 
 
 def test_do_command_diff_invalid_file_path():
-    versions = ["invalid_path1.txt", "invalid_path2.txt"]
+    versions = ["test-files/invalid_path1.txt", "test-files/invalid_path2.txt"]
     result = do_command("diff", [], [], [], versions, "")
     assert result == "file is not a valid file path"
 
 
 def test_do_command_diff_files_identical():
-    versions = ["test_file1.txt", "test_file1_copy.txt"]
+    versions = ["test-files/test_file1.txt", "test-files/test_file1_copy.txt"]
     result = do_command("diff", [], [], [], versions, "")
     assert result == "Files are identical"
 
 
 def test_do_command_diff_files_different():
-    versions = ["test_file1.txt", "test_file2.txt"]
+    versions = ["test-files/test_file1.txt", "test-files/test_file2.txt"]
     result = do_command("diff", [], [], [], versions, "")
     assert result == "Files are different"
 
