@@ -1,65 +1,79 @@
 import os
 import filecmp
+from abc import ABC, abstractmethod
 
-class CommandFactory:
-    def __init__(self):
-        pass
-
-    def create_command(self, command, *parameters):
-        self.command = command
-        COMMANDDICTIONARY = {
-            "status": Status,
-            "commit": Commit,
-            "log": Log,
-            "diff": Diff
-        }
-        print(f"Command is: {self.command}")
-        if command in COMMANDDICTIONARY:
-            return COMMANDDICTIONARY[self.command](*parameters)
-        else:
-            return f"{command} is not supported by git"
-
-class Command:
+class Command(ABC):
     def __init__(self) -> None:
         pass
+    
+    @abstractmethod
+    def execute(self):
+        pass
+
+def create_command(command, *parameters):
+    COMMAND_DICTIONARY = {
+        "status": Status,
+        "commit": Commit,
+        "log": Log,
+        "diff": Diff
+    }
+
+    if command in COMMAND_DICTIONARY:
+        return COMMAND_DICTIONARY[command](*parameters)
+    return f"{command} is not supported by git"
+
 
 class Status(Command):
     def __init__(self, *parameters):
-        self.pathSpecs = parameters[0]
-    
+        self.path_specs = parameters[0]
+
+    def check_is_list(self):
+        if not isinstance(self.path_specs, list):
+            raise TypeError("pathSpecs should be a list")
+
     def execute(self):
-        return f"Status for: {', '.join(self.pathSpecs)}"
-    
+        return f"Status for: {', '.join(self.path_specs)}"
+
 class Commit(Command):
     def __init__(self, *parameters):
-        print(parameters[0])
-        self.filePaths = parameters[0]
+        self.file_paths = parameters[0]
         self.message = parameters[1]
-    
+
+    def check_is_list(self):
+        if not isinstance(self.file_paths, list):
+            raise TypeError("filePaths should be a list")
+
     def execute(self):
         if not self.message:
             return "Please enter a commit message"
-        for path in self.filePaths:
+        for path in self.file_paths:
             if not os.path.exists(path):
                 raise ValueError(f"{path} is not a valid file path")
-        return f"Committed: {', '.join(self.filePaths)}"
-
+        return f"Committed: {', '.join(self.file_paths)}"
 
 class Log(Command):
     def __init__(self, *parameters):
-        self.pathsToShowLogFor = parameters[0]
+        self.paths_to_show_log_for = parameters[0]
+
+    def check_is_list(self):
+        if not isinstance(self.paths_to_show_log_for, list):
+            raise TypeError("pathsToShowLogFor should be a list")
 
     def execute(self):
-        return f"Log for: {', '.join(self.pathsToShowLogFor)}"
+        return f"Log for: {', '.join(self.paths_to_show_log_for)}"
 
 class Diff(Command):
     def __init__(self, *paramaters):
         self.versions = paramaters[0]
-        print(self.versions)
+
         if len(self.versions) != 2:
-            raise ValueError("diff command requires exactly 2 versions") 
+            raise ValueError("diff command requires exactly 2 versions")
         self.file1 = self.versions[0]
         self.file2 = self.versions[1]
+
+    def check_is_list(self):
+        if not isinstance(self.versions, list):
+            raise TypeError("versions should be a list")
 
     def execute(self):
         if not os.path.exists(self.file1):
@@ -68,6 +82,5 @@ class Diff(Command):
             return "file is not a valid file path"
         if filecmp.cmp(self.file1, self.file2):
             return "Files are identical"
-        else:
-            return "Files are different"
-
+        return "Files are different"
+    
