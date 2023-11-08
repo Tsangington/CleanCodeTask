@@ -6,5 +6,5 @@ def command_controller(command, *paramaters):
     then executing the command.
     """
     inputCommand = cmd.create_command(command, *paramaters)
-    inputCommand.check_is_list()
+    inputCommand.check_arguments_for_error()
     return inputCommand.execute()

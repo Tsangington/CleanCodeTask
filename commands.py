@@ -31,7 +31,8 @@ def create_command(command, *parameters):
         "status": Status,
         "commit": Commit,
         "log": Log,
-        "diff": Diff
+        "diff": Diff,
+        "merge": Merge
     }
 
     if command in COMMAND_DICTIONARY:
@@ -116,3 +117,21 @@ class Diff(Command):
             return "Files are identical"
         return "Files are different"
     
+class Merge(Command):
+    """
+    The merge command which merges 2 files together.
+    """
+    def __init__(self, *parameters):
+        self.file_path_1 = parameters[0]
+        self.file_path_2 = parameters[1]
+        if self.file1 == self.file2:
+            raise ValueError("files are the same, there is no need to merge")
+    
+    def check_arguments_for_error(self):
+        if not isinstance(self.file_path_1, list):
+            raise TypeError("filepath 1 should be a list")
+        if not isinstance(self.file_path_2, list):
+            raise TypeError("filepath 2 should be a list")
+
+    def execute(self):
+        print("files will be merged")
